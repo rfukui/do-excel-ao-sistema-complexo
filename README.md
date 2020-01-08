@@ -11,6 +11,6 @@ Como podem observar é um sistema bem básico. Nem deveriamos chamar muito de si
 
 ##  Como trabalharemos
 
-Vamos estruturar em 3 etapas, converter esses dados para um banco de dados relacional (Aqui usaremos um postgress), onde trabalharemos os conceitos de DML e DDL.
+Vamos estruturar em 3 etapas, converter esses dados para um banco de dados relacional (Aqui usaremos um postgres), onde trabalharemos os conceitos de DML e DDL.
 Em um processo seguinte colocaremos o trabalho em uma API que retorna e inclui as informações diretamente com os comandos de bancos de dados (DDL).
 Após essa etapa refatoraremos o código para usarmos o Sequelize, substituindo os selects, inserts e updates por comandos deste ORM.
