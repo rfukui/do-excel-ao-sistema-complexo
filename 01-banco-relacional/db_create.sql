@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS store;
+CREATE DATABASE store;
 \c store
 CREATE TABLE IF NOT EXISTS publishers(
     id         SERIAL   PRIMARY KEY,

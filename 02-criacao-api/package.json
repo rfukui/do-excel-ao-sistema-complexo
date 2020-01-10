@@ -1,0 +1,20 @@
+{
+  "name": "store-api",
+  "version": "1.0.0",
+  "description": "my first api tutorial",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon  ./index.js",
+    "test": "jest"
+  },
+  "author": "rfukui",
+  "license": "Unlicense",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "jest": "^24.9.0",
+    "nodemon": "^2.0.2",
+    "npm": "^6.13.6",
+    "pg": "^7.17.0"
+  }
+}

@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+  dev:
+    image: node:12-alpine
+    container_name: store_api_dev
+    command:  npm run dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app:cached
+    links:
+      - db
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    container_name: store02_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+
+volumes:
+  database:

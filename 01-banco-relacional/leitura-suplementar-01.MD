@@ -30,3 +30,8 @@ Utilizamos o ALTER para alterar propriedades das tabelas criadas, por exemplo, c
 ALTER TABLE books
 ADD COLUMN author CHAR(255);
 ```
+
+## DML
+
+DML vem do inglês, data manipulation language, ou seja, linguagem de manipulação de dados, serve, como o próprio nome diz, para manipular dados.
+Os tipos de DML são, SELECT, INSERT, UPDATE e DELETE.
