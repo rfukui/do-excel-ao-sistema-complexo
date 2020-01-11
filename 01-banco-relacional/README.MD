@@ -7,13 +7,13 @@ O termo é aplicado aos próprios dados, quando organizados dessa forma, ou a um
 
 Mas o que significa tudo isso?
 
-Um Banco de Dados é o lugar onde normalmente se [persistem](https://pt.wikipedia.org/wiki/Persist%C3%AAncia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)) os dados em sistemas computacionais. Sendo assim, podemos dizer que ele é nosso armazém de dados, o lugar onde vamos buscar as informações e as gravamos de forma "padronizada", seguindo regras muito bem definidas para gravação, alteração e consulta.
+Um banco de dados é o lugar onde normalmente se [persistem](https://pt.wikipedia.org/wiki/Persist%C3%AAncia_(ci%C3%AAncia_da_computa%C3%A7%C3%A3o)) os dados em sistemas computacionais. Sendo assim, podemos dizer que ele é nosso armazém de dados, o lugar onde vamos buscar as informações e as gravamos de forma "padronizada", seguindo regras muito bem definidas para gravação, alteração e consulta.
 
 Para quem não conhece o sistema de tabelas, ele é muito similar ao que existem em planilhas; inclusive a abstração de tabelas para planilhas é bem comum. Porém, a forma de se fazer pesquisas e agrupamentos difere muito da forma como normalmente é feito em sistemas como o MS Excel ou o Google Sheets.
 
 Neste curso não entraremos em detalhes sobre como são feitos os **SGDBR**. Eu não recomendaria, neste momento, tentar entender muito bem como eles funcionam; apenas assumiremos que eles funcionam muito bem. Mas, para matar a curiosidade, aqui está o [código fonte](https://github.com/postgres/postgres) do Postgres, o banco que utilizaremos de agora em diante no nosso curso. Ele é escrito em C bem avançado.
 
-## Como instalar um Banco de Dados
+## Como instalar um banco de dados
 
 Neste curso usaremos uma máquina virtual Docker para fazer a instalação. Para entender mais sobre Docker, recomendo o livro [Docker Para Desenvolvedores](https://github.com/gomex/docker-para-desenvolvedores) de Rafael Gomes ([gomex](https://twitter.com/gomex)).
 
