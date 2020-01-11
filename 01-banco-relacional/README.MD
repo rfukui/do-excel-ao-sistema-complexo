@@ -48,7 +48,7 @@ Caso não tenha problemas, instale o cliente de conexão ao banco Postgres diret
 Abra outra janela no terminal e insira o comando
 
 ```
-# apt install postgresql-client //Linux
+# apt install postgresql-client
 # 
 ```
 (Atenção: esse comando só vai funcionar no Linux. Para instalar o postgres-client em outros sistemas operacionais, você pode seguir [essas instruções](https://www.ibm.com/cloud/blog/new-builders/postgresql-tips-installing-the-postgresql-client). Após a instalação correta, os outros comandos abaixo são os mesmos e funcionarão normalmente) 
