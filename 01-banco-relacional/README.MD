@@ -17,7 +17,7 @@ Neste curso não entraremos em detalhes sobre como são feitos os **SGDBR**. Eu 
 
 Neste curso usaremos uma máquina virtual Docker para fazer a instalação. Você precisa do Docker instalado no seu computador antes de começar qualquer coisa, então visite o [site oficial](https://www.docker.com/products/docker-desktop). Se tiver qualquer problema na instalação ou se quiser entender mais sobre Docker, recomendo o livro [Docker Para Desenvolvedores](https://github.com/gomex/docker-para-desenvolvedores) do Rafael Gomes ([gomex](https://twitter.com/gomex)).
 
-Depois de instalar o Docker, crie um diretório em seu computador com o nome que achar melhor. Eu recomendaria um nome mnemônico, como livraria, ou loja. Aqui vamos usar _store_, porque costumo usar nomes em inglês para meus serviços, principalmente os de código aberto, assim eles ficam mais fáceis de serem lidos em qualquer parte do mundo que não seja lusófona. Dentro dele, copie o arquivo `docker-compose.yml` que se encontra aqui no diretório do nosso curso.
+Depois de instalar o Docker, crie um diretório em seu computador com o nome que achar melhor. Eu recomendaria um nome mnemônico, como livraria, ou loja. Aqui vamos usar _store_, porque costumo usar nomes em inglês para meus serviços, principalmente os de código aberto, assim eles ficam mais fáceis de serem lidos em qualquer parte do mundo que não seja lusófona. Dentro dele, copie o arquivo `docker-compose.yml` que se encontra aqui no repositório do nosso curso.
 
 ```yml
 version: '3.4'
@@ -35,23 +35,29 @@ volumes:
   database:
 
 ```
-Após instalar o Docker e copiar o arquivo no diretório do projeto, execute (no diretório raiz do projeto) o comando:
+Após copiar o arquivo no diretório do projeto, execute (no diretório raiz do projeto) o comando:
 ```
 $ docker-compose up
 ```
 ***ATENÇÃO: o $ significa que o comando está sendo executado como usuário normal e não root, quando algo for executado como root o # será o primeiro caracter***
 
-Caso não esteja usando o Linux, ou não se sentir confortável com a linha de comando, existe uma série de programas (como o [dbeaver](https://dbeaver.io/)) para conectar e trabalhar com bancos de dados. Caso não tenha problemas, instale o cliente de conexão ao banco Postgres diretamente pelo terminal.
+Caso não esteja usando o Linux, ou não se sentir confortável com a linha de comando, existe uma série de programas (como o [dBeaver](https://dbeaver.io/)) para conectar e trabalhar com bancos de dados. Você pode instalar o dBeaver e ver [aqui](INSERIR LINK PRO YOUTUBE) um vídeo sobre como utilizá-lo, ou trabalhar com o Postgres diretamente pelo terminal.
+
+Caso não tenha problemas, instale o cliente de conexão ao banco Postgres diretamente pelo terminal.
+
+Abra outra janela no terminal e insira o comando
 
 ```
-# apt install postgresql-client
+# apt install postgresql-client //Linux
+# 
 ```
+(Atenção: esse comando só vai funcionar no Linux. Para instalar o postgres-client em outros sistemas operacionais, você pode seguir [essas instruções](https://www.ibm.com/cloud/blog/new-builders/postgresql-tips-installing-the-postgresql-client). Após a instalação correta, os outros comandos abaixo são os mesmos e funcionarão normalmente) 
 
-Em outro terminal, rode
+Em seguida, rode
 ```
 $ psql -h 127.0.0.1 -U postgres
 ```
-E você se conectará ao banco de dados.
+E você se conectará ao banco de dados (caso queira sair, basta digitar `exit`).
 
 Após se conectar ao banco criaremos o nosso primeiro *database* com o comando
 
@@ -64,7 +70,8 @@ Para conferir se o database foi criado rode o comando:
 ```
 \l
 ```
-ele deverá retornar algo parecido com isso:
+(pressione `q` para sair, se necessário)
+Ele deverá retornar algo parecido com isso:
 ```
                                 List of databases
   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
@@ -105,14 +112,17 @@ CREATE TABLE books(
     sell_value    DECIMAL(10,2) NOT NULL,
     author_id     INTEGER      NOT NULL,
     publisher_id  INTEGER      NOT NULL,
-    created_at    TIMESTAMP    DEFAULT NOW());
+    created_at    TIMESTAMP    DEFAULT NOW()
+);
 ```
+Digite `\d` para ver as tabelas criadas :)
+Você vai ver que existem `tables` e `sequences` na lista. O que está listado como `sequence` foi criado automaticamente para lidar com o tipo de dado `SERIAL`, você não precisa se preocupar com isso agora.
 
-Neste caso, criamos as tabelas usando apenas as chaves primárias (uma chave/identificador único, indexado, que pode ou não ser uma representação de negócio), mas uma das coisas mais importantes de um banco de dados relacional é exatamente que ele pode *relacionar* tabelas a uma outra tabela ou mais, utilizando chaves estrangeiras (_foreign keys_). Mas o que é isso, você pode estar se perguntando?
+Neste caso, criamos as tabelas usando apenas as chaves primárias (uma chave/identificador único, indexado, que pode ou não ser uma representação de negócio), mas uma das coisas mais importantes de um banco de dados relacional é exatamente que ele pode *relacionar* tabelas umas às outras, utilizando chaves estrangeiras (_foreign keys_). Mas o que é isso, você pode estar se perguntando?
 
 Chaves estrangeiras são o que conecta uma tabela a outra.
 
-Vamos tomar por base nosso exemplo. Nosso banco de dados poderia ter apenas uma única tabela que chamasse dados, e ser algo próximo disso:
+Vamos tomar por base nosso exemplo. Nosso banco de dados poderia ter apenas uma única tabela que chamasse dados, e ser algo próximo disso (não precisa criar essa tabela em seu banco, apenas leia com cuidado e anote o que não entender para pesquisar):
 
 ```SQL
 \c store
@@ -127,23 +137,25 @@ CREATE TABLE dados(
     author_is_alive    BOOLEAN       NOT NULL,
     created_at         TIMESTAMP     DEFAULT NOW());
 ```
-Digamos que por exemplo, a editora mudou de endereço, então você teria que fazer um *update* na tabela com algo assim:
+Digamos que por exemplo, a editora mudou de endereço (_publisher_address_), então você teria que fazer um *update* na tabela com algo assim:
 
 ```SQL
 UPDATE dados
-SET publisher_address = 'endereço novo'
+SET publisher_address = 'Rua Nova, número tal'
 WHERE publisher_name = 'nome da editora' /* caso eu tenha colocado o nome certo em todos os meus cadastros de livros*/
 ;
 COMMIT;
 ```
-Aí você se pergunta: Ok, mas o que isso tem que ver com chaves estrangeiras?
+(Veja uma diferença na sintaxe do SQL: Onde no JavaScript utilizamos `===` para comparação, aqui utilizamos apenas `=`)
+
+Aí você se pergunta: Ok, mas o que isso tem que ver com chaves estrangeiras? No exemplo acima, a tabela foi montada de forma que, para cada livro que quiséssemos inserir, teríamos que repetir o endereço da editora, se a pessoa que escreveu está vida, etc. Nada prático.
 
 Quando criamos um banco de dados existem algumas padronizações, conhecidas como formas normais. Elas servem para evitarmos qualquer tipo de dado duplicado em tabelas, como por exemplo o endereço de uma pessoa ou dados compostos por outros dados.
 Não precisamos gravar várias vezes o mesmo endereço de uma editora, se ele é único. Da mesma forma que não precisamos gravar a idade de alguém se temos sua data de nascimento (o que neste caso é ainda pior, porque em um sistema grande, com muitas pessoas cadastradas, a chance de ter alguém mudando de idade todos os dias é bem grande, concorda?).
-Neste nosso sitema utilizaremos a [quarta forma normal](https://pt.wikipedia.org/wiki/Normaliza%C3%A7%C3%A3o_de_dados).
 
-Após entender o que são formas normais, precisamos ligar os bancos, porque não é apenas criar os campos com nomes *bonitinhos* que eles passam a assumir os dados de outras tabelas, eles precisam estar ligados por chave primária e estrangeira.
+Neste nosso sistema utilizaremos a [quarta forma normal](https://pt.wikipedia.org/wiki/Normaliza%C3%A7%C3%A3o_de_dados).
 
+Após entender o que são formas normais, precisamos ligar os bancos, porque não é só criar os campos com nomes *bonitinhos* que eles passam a assumir os dados de outras tabelas, eles precisam estar ligados por chave primária e estrangeira.
 
 ```SQL
 \c store
@@ -152,10 +164,10 @@ ADD CONSTRAINT authors_x_books FOREIGN KEY (author_id) REFERENCES authors (id);
 ALTER TABLE books
 ADD CONSTRAINT publishers_x_books FOREIGN KEY (publisher_id) REFERENCES publishers (id);
 ```
-Neste momento a tabela de livros somente aceitará dados nos campos author_id e publisher_id que existirem nas tabelas mães.
+Neste momento a tabela de livros (_books_) somente aceitará dados nos campos author_id e publisher_id que existirem nas tabelas-mães (_authors_ e _publishers_).
 
 ### Inserindo dados nas tabelas existentes
-Pode parecer um pouco estranha essa abordagem a princípio, mas você só pode criar um livro se ja existirem editoras e escritores cadastrados.
+Pode parecer um pouco estranha essa abordagem a princípio, mas você só pode criar um livro se já existirem editoras e escritores cadastrados.
 Mas como inserimos esses dados?
 Usando o DML (_Data Modeling Language_) de INSERT.
 
@@ -171,11 +183,13 @@ values
 ('Ursula K LeGuin', TRUE);
 COMMIT;
 ```
-Agora vamos consultar os dados que cadastramos com o DML SELECT;
+Agora vamos consultar os dados que cadastramos utilizando o SELECT;
 ```SQL
 SELECT * FROM authors;
 ```
-Você verá que eu errei o estado de vida da Ursula LeGuin, talvez porque eu goste muito dela e gostaria que ela estivesse viva. Mas, voltando ao assunto, precisamos corrigir essa informação no banco de dados, e vamos fazer isso com um _update_ na tabela.
+(novamente, utilize o `q` para sair, se necessário)
+
+Revendo a tabela eu vejp que errei o estado de vida da Ursula LeGuin, talvez porque eu goste muito dela e gostaria que ela estivesse viva. Mas, voltando ao assunto, precisamos corrigir essa informação no banco de dados (ela morreu em 2018), e vamos fazer isso com um _update_ na tabela.
 
 ```SQL
 BEGIN TRANSACTION;
@@ -184,7 +198,7 @@ SET is_alive = FALSE
 WHERE ID = 2;
 COMMIT;
 ```
-Talvez tenha notado que toda alteração em uma tabela comece com *BEGIN TRANSACTION* e finalize com *COMMIT*. Utilizamos essa notação para que, se acontecer qualquer erro durante o processo de alterar os dados das tabelas, os dados não são salvos. Façam o teste a seguir:
+Notou que toda alteração em uma tabela começa com *BEGIN TRANSACTION* e finaliza com *COMMIT*? Utilizamos essa notação para que, se acontecer qualquer erro durante o processo de alterar os dados das tabelas, os dados não são salvos. Façam o teste a seguir, trocando um detalhe no nome da autora:
 
 ```SQL
 BEGIN TRANSACTION;
@@ -195,8 +209,11 @@ values
 INSERT INTO authors
 (name, is_alive)
 values
-('Ursula K Le Guin', FALSE);
+('Ursula K LeLeLe Guin', FALSE);
 select * from authors;
+```
+Aparentemente deu tudo certo. Mas agora rode as linhas abaixo:
+```
 ROLLBACK;
 select * from authors;
 ```
