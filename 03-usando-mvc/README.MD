@@ -1,28 +1,30 @@
-Ok, agora seu tio já tem uma api que pode ser consumida e alimentada, mas ela tem alguns vários problemas ainda, nesta forma por exemplo podemos fazer um processo hacker bem conhecido como [SQL INJECTION](https://www.devmedia.com.br/sql-injection/6102) e vamos concordar com outra coisa também, estudamos muito orientação a objetos e sabemos que nosso código anterior ele é quaze zero OO.
+Ok, agora seu tio já tem uma API que pode ser consumida e alimentada, mas ela ainda tem problemas.
 
-Vamos começar a fazer isso de forma bem mais profissional, usando um [ORM](https://pt.wikipedia.org/wiki/Mapeamento_objeto-relacional) para acessar os dados, separaremos as coisas em uma arquitetura do tipo [MVC](https://pt.wikipedia.org/wiki/MVC), com rotas bem definidas e deixaremos obviamente de ter uma aplicação tipo single file application.
+Da forma como está funcionando atualmente é possível, por exemplo, causar um estrago no banco de dados usando um processo hacker bem conhecido como [SQL INJECTION](https://www.devmedia.com.br/sql-injection/6102) e, vamos concordar, já estudamos bastante orientação a objetos e sabemos que no nosso código anterior não tem muito disso.
 
-Primeira coisa, vamos começar um novo projeto usando também o sequelize com todas as outras coisas que j'a tinhamos instalado.
+Vamos começar a fazer isso de forma bem mais profissional, usando um [ORM](https://pt.wikipedia.org/wiki/Mapeamento_objeto-relacional) para acessar os dados. Vamos separar as partes da aplicação em uma arquitetura do tipo [MVC](https://pt.wikipedia.org/wiki/MVC), com rotas bem definidas, e obviamente deixaremos de ter uma aplicação tipo _single file application_ (afinal de contas já sabemos trabalhar em estruturas de arquivo mais complexas e não precisamos escrever todo nosso código num só arquivo `script.js`, `app.js` ou `index.js`).
 
-você deve estar se perguntando, porque não apenas adcionar o sequelize no projeto e refatorar, por um motivo bem simples, é muito mais fácil recomeçar um projeto do jeito certo que tentar arrumar um projeto capenga, em programação precisamos praticar o desapego afetivo ao código. Então partiu jogar código fora e fazer do zero.
+Primeira coisa: Vamos começar um novo projeto usando também o Sequelize, além de todas as outras ferramentas que já tínhamos instalado.
 
-Vamos criar uma nova pasta de projeto chamada new_store
-e trabalhar dentro dela.
+Aí você deve estar se perguntando: por que não apenas adcionar o Sequelize no projeto e refatorar?
+O motivo é simples: é muito mais fácil recomeçar um projeto do jeito certo que tentar arrumar um projeto capenga, e em programação precisamos praticar sempre o desapego afetivo ao código. Então partiu jogar código fora e fazer do zero, agora de forma melhor.
 
-```
-$ mkdir new_store && cd new_store && npm init
-```
-Com isso iniciamos nosso novo projeto e agora vamos instalar as coisas dentro dele, começando por instalar as dependências e criando um novo index.js
+Vamos criar uma nova pasta de projeto chamada `new_store` (fora da pasta que trabalhamos antes!) e começar a desenvolver dentro dela.
 
 ```
- $ npm install jest pg express body-parser nodemon sequelize
+$ mkdir new_store && cd new_store && npm init -y
 ```
-Como estamos fazendo as coisas mais profissionais também adotaremos um linter (verificador de código, para saber se está tudo perfeito do ponto de vista de escrita do código), toda vez que fazemos um código que mais de uma pessoa vai trabalhar é bom adotar padrões de desenvolvimento bem estritos, para evitar conflitos no código.
+Com isso iniciamos nosso novo projeto e agora vamos instalar o que precisamos, começando pelas dependências e criando um novo index.js
 
 ```
-npm install --save-dev eslint eslint-config-airbnb-base eslint-plugin-import
+ $ npm install jest express body-parser nodemon
 ```
-Alteraremos a chave de scripts e ela deve ficar assim:
+Como estamos fazendo tudo de uma forma mais profissional, também adotaremos um linter (verificador de código, para saber se está tudo perfeito do ponto de vista de estilo), pois toda vez que escrevemos um código em que mais de uma pessoa vai trabalhar é bom adotar padrões de desenvolvimento bem estritos, para evitar conflitos no código.
+
+```
+$ npm install --save-dev eslint eslint-config-airbnb-base eslint-plugin-import
+```
+Alteraremos a chave de `scripts` para ficar assim:
 
 ```json
 "scripts": {
@@ -31,9 +33,9 @@ Alteraremos a chave de scripts e ela deve ficar assim:
 },
 
 ```
-Lembrando sempre que você pode usar outros nomes e isso não é ruim, mas tome cuidado.
+Lembrando sempre que você pode usar outros nomes e isso não é ruim, mas tome cuidado para não se confundir no restante do curso :)
 
-Agora seu package.json deve estar algo próximo disso:
+Agora seu `package.json` deve estar algo próximo disso:
 
 ```json
 {
@@ -45,15 +47,13 @@ Agora seu package.json deve estar algo próximo disso:
     "test": "jest",
     "dev":  "nodemon --exec babel-node ./api/index.js"
   },
-  "author": "Ricardo Fukui",
+  "author": "",
   "license": "Unlicense",
   "dependencies": {
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
     "jest": "^24.9.0",
-    "nodemon": "^2.0.2",
-    "pg": "^7.17.1",
-    "sequelize": "^5.21.3"
+    "nodemon": "^2.0.2"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
@@ -63,12 +63,12 @@ Agora seu package.json deve estar algo próximo disso:
 }
 
 ```
-Pode agora estar estranhando um pouco que o script de desenvolvimento aponta para um arquivo em um diretório que nem existe, mas não se preocupe. vamos criar tanto o diretório quanto o arquivo.
+Pode parecer um pouco estranho que o script de desenvolvimento aponte para um arquivo em um diretório que nem existe, mas não se preocupe. Vamos criar agora tanto o diretório quanto o arquivo.
 
 ```
 $ mkdir api && touch api/index.js
 ```
-Estou partindo do pressuposto que estamos dentro do diretório `new_store` mas você pode criar tudo isso com seu editor de textos favorito.
+Estou partindo do pressuposto que estamos dentro do diretório `new_store` e estamos criando diretórios e arquivos dentro dele. Aqui usamos comandos do terminal para criar tudo isso, mas você pode usar seu editor de textos favorito.
 
 Vamos agora criar novamente o arquivo do docker-compose, aquele que você já está craque.
 
@@ -107,66 +107,82 @@ E editaremos o arquivo `api/index.js`
 
 ```js
 import express from 'express'
-
 import bodyParser from 'body-parser'
+
 const app = express()
+
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+
 const port = process.env.PORT || 3000
-// when a random route is inputed
+
 app.get('*', (req, res) => res.status(200).send({
    message: 'Esta é a API da nossa livraria.'
 }))
+
 app.listen(port, () => {
    console.log(`Server is running on PORT ${port}`)
-
 })
-export default app
 
+export default app
 ```
-Para conseguirmos usar completamente o ECMA6 precisaremos instalar o babel e ninguém gosta de escrever js como um neandertal, não é mesmo?
+
+Para conseguirmos usar completamente o ECMA6 precisaremos instalar o Babel, então vamos fazer isso pois ninguém gosta de escrever JS desatualizado e fora de moda, não é mesmo?
 
 ```
 $ npm install --save-dev @babel/core @babel/cli @babel/node \
 @babel/plugin-transform-runtime @babel/preset-env \
 @babel/register @babel/runtime babel-loader
 ```
+Junto com a instalação, vamos criar na raiz do projeto o arquivo de configuração do Babel, `.babelrc`, e adicionar nele as seguintes linhas:
+
+```json
+{
+   "presets": ["@babel/preset-env"],
+   "plugins": [["@babel/transform-runtime"]]
+}
+```
 
 Agora é só executar o seu container:
 ```
 $ docker-compose up dev
 ```
-Pronto, você tem o seu servidor no ar.
+(não esqueça de executar `docker-compose down` antes disso, se você ainda estiver com o projeto anterior no ar)
+E pronto, nosso novo servidor está no ar.
 
+Para fazer a interface do Node.js com bancos relacionais como o Postgres, utilizamos o ORM [Sequelize](https://sequelize.org/). O Sequelize vai cuidar de toda a comunicação com o banco, sem que a gente precise mais se preocupar em fazer *queries* (`SELECT`, `INSERT`, etc) como no projeto anterior. Utilizaremos a partir de agora a sintaxe do Sequelize, que é mais intuitiva. 
+
+Vamos instalar agora as dependências do Sequelize:
 ```
 $ npm install sequelize-cli
 ```
 
-Vamos criar no nosso diretório raiz o arquivo `.sequelizerc` com o seguinte conteudo:
+E criar no nosso diretório raiz o arquivo `.sequelizerc` com o seguinte conteúdo:
 ```
-const path  = require('path')module.exports = {
+const path  = require('path')
+
+module.exports = {
     "config": path.resolve('./api/server/src/config', 'config.js'),
     "models-path": path.resolve('./api/server/src/models'),
     "seeders-path": path.resolve('./api/server/src/seeders'),
     "migrations-path": path.resolve('./api/server/src/migrations')
 }
 ```
-Instalaremos também o path, sequelize, pg  e pg-hstore
-
+Instalaremos também o `path`, `sequelize`, `pg` e `pg-hstore` (o `pg` é de Postgres):
 ```
 $ npm install --save path sequelize pg pg-hstore
 ```
-Como fizemos a instalação do sequelize de forma local (sem o -g eu espero) vamos executar o init dele usando o npx. Neste momento você pode estar se perguntando, mas porque eu vou usar isso?
+Como fizemos a instalação do Sequelize de forma local (sem o -g eu espero), vamos executar o init dele usando o `npx`. Neste momento você pode estar se perguntando: mas por que eu vou usar isso?
 
-O npx executa primariamente utilizando os binários locais e caso ele não encontre, ele busca nos globais.
+O `npx` executa primariamente utilizando os binários locais e, caso ele não encontre, busca nos globais.
 
 ```
 $ npx sequelize init
 ```
-Seu projeto neste monento vai parecer com esta estrutura:
+Seu projeto neste momento vai ter uma estrutura parecida com a abaixo (aproveite agora para criar o arquivo `.gitignore` e incluir nele o `node_modules`!):
 
 ```
-├── node-modules
+├── node_modules
 ├── api
 │   ├── index.js
 │   └── server
@@ -178,12 +194,14 @@ Seu projeto neste monento vai parecer com esta estrutura:
 │           │   └── index.js
 │           └── seeders
 ├── docker-compose.yml
+├── .babelrc
+├── .sequelizerc
+├── .gitignore
 ├── package.json
 └── package-lock.json
 
 ```
-Agora vamos editar um pouco os arquivos gerados.
-
+Agora vamos editar um pouco os arquivos gerados:
 `./api/server/src/models/index.js`
 
 ```js
@@ -251,8 +269,8 @@ export default db
 ```
 `./api/server/src/config/config.js`
 
-```json
-{
+```js
+const config = {
   "development": {
     "username": "postgres",
     "password": null,
@@ -278,4 +296,6 @@ export default db
     "operatorsAliases": false
   }
 }
+
+export default config
 ```
