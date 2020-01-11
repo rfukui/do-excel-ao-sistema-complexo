@@ -15,9 +15,9 @@ Neste curso não entraremos em detalhes sobre como são feitos os **SGDBR**. Eu 
 
 ## Como instalar um banco de dados
 
-Neste curso usaremos uma máquina virtual Docker para fazer a instalação. Para entender mais sobre Docker, recomendo o livro [Docker Para Desenvolvedores](https://github.com/gomex/docker-para-desenvolvedores) de Rafael Gomes ([gomex](https://twitter.com/gomex)).
+Neste curso usaremos uma máquina virtual Docker para fazer a instalação. Você precisa do Docker instalado no seu computador antes de começar qualquer coisa, então visite o [site oficial](https://www.docker.com/products/docker-desktop). Se tiver qualquer problema na instalação ou se quiser entender mais sobre Docker, recomendo o livro [Docker Para Desenvolvedores](https://github.com/gomex/docker-para-desenvolvedores) do Rafael Gomes ([gomex](https://twitter.com/gomex)).
 
-Crie um diretório em seu computador com o nome que achar melhor. Eu recomendaria um nome mnemônico, como livraria, ou loja. Aqui vamos usar _store_, porque costumo usar nomes em inglês para meus serviços, principalmente os de código aberto, assim eles ficam mais fáceis de serem lidos em qualquer parte do mundo que não seja lusófona. Dentro dele, copie o arquivo `docker-compose.yml` que se encontra aqui no diretório do nosso curso.
+Depois de instalar o Docker, crie um diretório em seu computador com o nome que achar melhor. Eu recomendaria um nome mnemônico, como livraria, ou loja. Aqui vamos usar _store_, porque costumo usar nomes em inglês para meus serviços, principalmente os de código aberto, assim eles ficam mais fáceis de serem lidos em qualquer parte do mundo que não seja lusófona. Dentro dele, copie o arquivo `docker-compose.yml` que se encontra aqui no diretório do nosso curso.
 
 ```yml
 version: '3.4'
