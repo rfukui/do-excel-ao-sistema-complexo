@@ -10,8 +10,22 @@ services:
       - "3000:3000"
     volumes:
       - ./:/app:cached
-    links:
+    networks:
+      - store-network
+    depends_on:
       - db
+
+  test:
+    image: node:12-alpine
+    container_name: new_store_api_test
+    command:  npm run test
+    working_dir: /app
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./:/app:cached
+    networks:
+      - store-network
     depends_on:
       - db
 
@@ -22,6 +36,12 @@ services:
       - "5432:5432"
     volumes:
       - database:/var/lib/postgresql/data
+    networks:
+      - store-network
 
 volumes:
   database:
+
+networks:
+  store-network:
+    driver: bridge

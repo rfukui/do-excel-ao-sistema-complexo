@@ -1,9 +1,9 @@
-{
+module.exports = {
   "development": {
     "username": "postgres",
     "password": null,
     "database": "new_store_development",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   },
@@ -11,7 +11,7 @@
     "username": "postgres",
     "password": null,
     "database": "new_store_test",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   },
@@ -19,7 +19,7 @@
     "username": "postgres",
     "password": null,
     "database": "new_store_production",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   }

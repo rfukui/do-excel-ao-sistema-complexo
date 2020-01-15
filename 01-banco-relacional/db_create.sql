@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS publishers(
 CREATE TABLE IF NOT EXISTS authors(
     id         SERIAL    PRIMARY KEY,
     name       CHAR(255) NOT NULL,
-    is_live    BOOLEAN   NOT NULL,
+    is_alive    BOOLEAN   NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 CREATE TABLE IF NOT EXISTS books(
