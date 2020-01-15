@@ -148,7 +148,7 @@ COMMIT;
 ```
 (Veja uma diferença na sintaxe do SQL: Onde no JavaScript utilizamos `===` para comparação, aqui utilizamos apenas `=`)
 
-Aí você se pergunta: Ok, mas o que isso tem que ver com chaves estrangeiras? No exemplo acima, a tabela foi montada de forma que, para cada livro que quiséssemos inserir, teríamos que repetir o endereço da editora, se a pessoa que escreveu está vida, etc. Nada prático.
+Aí você se pergunta: Ok, mas o que isso tem que ver com chaves estrangeiras? No exemplo acima, a tabela foi montada de forma que, para cada livro que quiséssemos inserir, teríamos que repetir o endereço da editora, se a pessoa que escreveu está viva, etc. Nada prático. Imagina se nesse banco tivéssemos mais de 100 livros dessa mesma editora que mudou de endereço? 
 
 Quando criamos um banco de dados existem algumas padronizações, conhecidas como formas normais. Elas servem para evitarmos qualquer tipo de dado duplicado em tabelas, como por exemplo o endereço de uma pessoa ou dados compostos por outros dados.
 Não precisamos gravar várias vezes o mesmo endereço de uma editora, se ele é único. Da mesma forma que não precisamos gravar a idade de alguém se temos sua data de nascimento (o que neste caso é ainda pior, porque em um sistema grande, com muitas pessoas cadastradas, a chance de ter alguém mudando de idade todos os dias é bem grande, concorda?).
