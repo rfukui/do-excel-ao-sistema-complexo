@@ -308,15 +308,16 @@ O arquivo de configuração referencia um banco de dados chamado "new_store_deve
 ```
 $ docker-compose up db
 ```
-Agora que você subiu o banco de dados, é só criar todos os bancos. Lembra que já fizemos isso nos passos anteriores? Em caso de dúvida volte alguns passos para relembrar como fazer. Mas agora não precisa inserir nenhum cadastro de livro, como fizemos anteriormente, pois vamos fazer isso com modelos.
+Agora que você subiu o banco de dados, é só criar todos os bancos que criamos anteriormente em _new_store_. Lembra como fizemos isso nos passos anteriores? Em caso de dúvida volte alguns passos para relembrar. Mas agora não precisa inserir nenhum cadastro de livro, como fizemos anteriormente, pois vamos fazer isso com modelos. 
 
 Vamos criar agora o nosso primeiro modelo, usando uma _feature_ do Sequelize.
-No terminal, navegue até a pasta raiz `new_store`. Vamos usar a linha de comando para criar um *modelo* para cadastrar primeiro os autores, com os campos que já conhecemos do antigo banco (nome, se está vivo). Vamos começar pelos autores para podermos usar suas informações como *chaves estrangeiras* em outras tabelas. Então sempre criamos os modelos a partir do mais básico, depois o mais completo (dos que não têm chaves estrangeiras para o que as têm):
+No terminal, navegue até a pasta raiz `new_store`. Vamos usar a linha de comando para criar um *modelo* para cadastrar primeiro os autores, com os campos que já conhecemos do antigo banco (nome, se está vivo). Vamos começar pelos autores para podermos usar suas informações como *chaves estrangeiras* em outras tabelas. Então sempre criamos os modelos a partir do mais básico, depois o mais completo (dos que não têm chaves estrangeiras para os que têm):
 
 ```
 $ npx sequelize-cli model:create --name Author --attributes name:string,is_alive:boolean
 ```
-Como pode ser observado, eu não criei os campos id e nem created_at, mas vamos vez o que existe no banco de dados observando o arquivo `./new_store/api/server/src/models/author.js`
+Se você ler o comando acima com atenção, vai ver que não foram criados os campos `id` e nem `created_at`.
+Esse comando criou, dentro da pasta `models`, um novo arquivo `author.js` e o Sequelize já até colocou algum código dentro dele pra facilitar a nossa vida (essa é uma das grandes vantagens de usá-lo). Vamos ver o que tem nele em `./new_store/api/server/src/models/author.js`:
 
 ```js
 'use strict';
@@ -331,12 +332,14 @@ module.exports = (sequelize, DataTypes) => {
   return Author;
 };
 ```
-Baseado nisso, criaremos as migrações necessárias da seguinte forma (até este momento para apenas uma tabela):
+O que está acontecendo nesse código? Leia cada linha com calma, e quando ver algum método que não reconheça (por exemplo, o método `.define` do Sequelize), faça uma pesquisa na documentação ou no Google mesmo. Depois, se quisermos, podemos modificar algumas coisas nele.
+
+Agora, baseado nisso, criaremos as migrações necessárias da seguinte forma (até este momento para apenas uma tabela, a `Author`):
 
 ```
 $ npx sequelize-cli db:migrate
 ```
-Então se logarmos no banco e procuramos a tabela vamos ver que ela foi criada com alguns campos extras, o que chamamos de campos de auditoria e o de identificação, os ORMs costumam fazer desta forma, notamos também que a tabela está com o nome no plural.
+Então se logarmos no banco (volte alguns passos se tiver que relembrar como) e procurarmos a tabela, veremos que ela foi criada com alguns campos extras, o que chamamos de campos de auditoria e o de identificação; os ORMs costumam fazer desta forma. Notamos também que a tabela está com o nome no plural.
 
 ```
 new_store_development=# select * from "Authors";
@@ -346,7 +349,7 @@ new_store_development=# select * from "Authors";
 
 ```
 
-Observena sua pasta de migrações *migrations* que um arquivo de migrations foi criado, no meu caso foi `./new_store/api/server/src/migrations/20200113215229-create-author.js`, e ele deve conter o seguinte conteudo:
+Veja que o comando acima também criou um arquivo na pasta `migrations`, que normalmente inicia com a data/hora. Enquanto este tutorial está sendo criado, o nome e caminho é `./new_store/api/server/src/migrations/20200113215229-create-author.js` (o seu vai ter um número diferente, claro), e ele deve conter o seguinte conteúdo:
 
 ```js
 'use strict';
@@ -380,15 +383,15 @@ module.exports = {
   }
 };
 ```
-Note que o arquivo foi criado com os campos que "estranhamos" existirem no banco de dados.
+Note que o arquivo foi criado com os campos que "estranhamos" existirem no banco de dados (`id`, `createdAt` e `updatedAt`). A ORM do Sequelize já faz esse trabalho pra gente, então quando criarmos as tabelas só temos que nos preocupar com as informações que queremos.
 
-Vamos criar agora também os modelos de Book e Publisher, primeiro o de publisher e depois o de book, porque o de book usa referência ao modelo de publisher.
+Vamos criar agora também os modelos de Book e Publisher. Seguindo a lógica que vimos anteriormente, vamos criar primeiro o de Publisher (editora), pois vamos precisar dos dados dessa tabela como referência para a tabela Books.
 
-Crie agora o de publisher e depois criaremos juntos o de book.
+Agora é com você! Utilizando as ferramentas de linha de comando do Sequelize, crie o modelo de Publisher e depois criaremos juntos o de Book. Pode usar os mesmos campos que usamos anteriormente, quando criamos as tabelas "na mão". Confirme nas pastas `model` e `migrations` se está tudo certinho!
 
-Vamos criar agora tanto o modelo quanto a migração de forma manual, da seguinte forma, primeiro vamos criar o modelo, depois a migração.
+Então vamos à tabela Books. Aqui vamos fazer um pouco diferente, escrevendo tanto o modelo quanto a migração de forma manual. Não deve ser difícil, uma vez que os arquivos que o Sequelize criou pra gente já dão uma "cola" de como eles devem ser.
 
-o modelo chamará Book e a migration será a create-books.
+O modelo se chamará `Book` e a migration será a `create-books`. Você pode fazer direto no seu editor de código.
 
 `books.js`
 ```js
@@ -441,14 +444,11 @@ module.exports = {
       authorId: {
         allowNull: false,
         type: Sequelize.INTEGER,
-        references: {model:'Authors', key:'id'}
       },
       publisherId: {
         allowNull: false,
         type: Sequelize.INTEGER,
-        references: {model:'Publishers', key:'id'}
       }
-
     });
   },
   down: (queryInterface, Sequelize) => {
@@ -458,9 +458,10 @@ module.exports = {
 
 ```
 
-Precisamos alterar também os arquivos de modelo de Autores e Editoras, para que eles possam ter suas associações criadas:
+Agora que já temos todas as tabelas que precisamos, é hora de integrar tudo!
+Vamos alterar os arquivos de modelo de Autores e Editoras, para que eles possam ter suas associações criadas (veja que o Sequelize até deixou um comentário no trecho de código):
 
-`autor.js`
+`author.js`
 
 ```js
 .
@@ -473,6 +474,7 @@ Precisamos alterar também os arquivos de modelo de Autores e Editoras, para que
 };
 
 ```
+
 `publisher.js`
 ```js
 .
@@ -485,10 +487,12 @@ Precisamos alterar também os arquivos de modelo de Autores e Editoras, para que
 };
 
 ```
-Criação das chaves extrangeiras nas tabelas:
+
+Criação das chaves estrangeiras nas tabelas:
+
 `create-books.js`
 ```js
-// arquivo de migração criando chaves
+// arquivo de migração com chaves estrangeiras
 
 authorId: {
   allowNull: false,
@@ -503,6 +507,7 @@ publisherId: {
 }
 
 ```
+Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `Books`, através da chave (_key_) `id`.
 
 ### Criando nossos serviços controladores e rotas
 
