@@ -144,7 +144,7 @@ static async authenticate(req) {
   const {username, password} = req
   if username ==="usuário de teste" && password ==="password de teste"{
     return { name : username }
-  } 
+  }
   const user = await database.User.findOne(
     { where : {
       name : username + "",
@@ -158,3 +158,216 @@ static async authenticate(req) {
 }
 
 ```
+Essa é uma prática válida para ambientes de desenvolvimento, mas cuidado sempre ao adotar algo assim nos seus códigos.
+
+### Criando um histórico de alteração de bancos de dados
+
+Nosso sistema está ficando bem interessante. Ele já tem autenticação e agora vamos colocar um histórico para todas as tabelas, eles são importantes porque conseguimos salvar todos os estados que o banco passa, eles são importantes, tanto para tentar descobrir possíveis bugs em suas aplicações quanto para descobrir se houveram transações indesejadas no seu banco.
+
+Para nosso sistema de histórico vamos utilizar o `sequelize-history` em conjunto com o sequelize-cli para gerar nossas tabelas historicas no banco.
+
+Vamos começar instalando o `sequelize-history`:
+
+```
+$ npm i sequelize-history --save
+```
+
+É bem intuitivo usar o `sequelize-history`, basta nos modelos existentes importa-lo e fazer uma pequena alteração no `index.js` do model:
+
+```js
+import fs from 'fs'
+import path from 'path'
+import Sequelize from 'sequelize'
+import configJson from '../config/config'
+
+const sequelizeHistory = require('sequelize-history');
+const basename = path.basename(__filename)
+const env = process.env.NODE_ENV ? process.env.NODE_ENV : 'development'
+
+const config = configJson[env]
+
+console.log('this is the environment: ', env)
+
+const db = {}
+
+let sequelize
+if (config.environment === 'production') {
+  sequelize = new Sequelize(
+      process.env[config.use_env_variable], config
+    )
+  sequelize = new Sequelize(
+    process.env.DB_NAME,
+    process.env.DB_USER,
+    process.env.DB_PASS, {
+      host: process.env.DB_HOST,
+      port: process.env.DB_PORT,
+      dialect: 'postgres',
+      dialectOption: {
+        ssl: true,
+        native: true
+      },
+      logging: true
+    }
+  )
+} else {
+  sequelize = new Sequelize(
+     config.database, config.username, config.password, config
+  )
+}
+const { Author, AuthorHistory } = sequelize.import('./author')
+const { User, UserHistory } = sequelize.import('./user')
+const { Publisher, PublisherHistory } = sequelize.import('./publisher')
+
+const models = {
+  Author,
+  AuthorHistory,
+  Publisher,
+  PublisherHistory,
+  User,
+  UserHistory
+}
+
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db)
+  }
+})
+
+db.sequelize = sequelize
+db.Sequelize = Sequelize
+
+const trackAll = require('sequelize-history').all
+trackAll(sequelize)
+export default db
+
+```
+
+Podem perceber que mudamos a forma como importamos os models de forma individual neste trecho do código:
+
+```js
+
+const { Author, AuthorHistory } = sequelize.import('./author')
+const { User, UserHistory } = sequelize.import('./user')
+const { Publisher, PublisherHistory } = sequelize.import('./publisher')
+
+const models = {
+  Author,
+  AuthorHistory,
+  Publisher,
+  PublisherHistory,
+  User,
+  UserHistory
+}
+
+```
+
+Isso implica em uma pequena mudança nos modelos também:
+
+```js
+
+'use strict';
+const sequelizeHistory = require('sequelize-history');
+
+const Author = (sequelize, DataTypes) => {
+  const Author = sequelize.define('Author', {
+    name: DataTypes.STRING,
+    is_alive: DataTypes.BOOLEAN
+  }, {});
+  Author.associate = function(models) {
+    Author.hasMany(models.Book)
+  };
+  const AuthorHistory = sequelizeHistory(Author, sequelize)
+
+  return { Author, AuthorHistory };
+};
+
+module.exports = Author
+
+```
+
+Nada muito diferente, apenas como podem ver, incluimos o AuthorHistory como um sequelizeHistory e exportamos ambos, é bem simples, porém ainda falta criar as migrations deles.
+
+aqui segue o exemplo da migração de autores:
+
+`create-author-history.js`
+```js
+'use strict';
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('AuthorHistories', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      modelId: {
+          type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING
+      },
+      is_alive: {
+        type: Sequelize.BOOLEAN
+      },
+      createdAt: {
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        type: Sequelize.DATE
+      },
+      archivedAt: {
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('AuthorHistories');
+  }
+};
+```
+
+Lembre-se que os nomes seguem padrões predeterminados. Você precisa criar todos os campos que já existem nas tabelas e mais 2 campos, o modelId e o id e tudo funcionará magicamente.
+
+Agora tente implementar um serviço na sua api que retorne o histórico de um autor com a seguinte url `/api/authors/:id/history`, lembre-se que este id não é o id do historico e sim do autor.
+
+
+### Niveis de permissão
+
+Para trabalharmos com níveis de permissão, também conhecida como Roles precisamos alterar um pouco nossos modelos e criar ainda mais complexidade ao sistema.
+
+Pensem que no mundo ideal todo mundo é bem honesto, mas estamos falando sobre sistemas de informações, logo existe também a falha humana, imagina que qualquer pessoa bastasse estar logada numa determinada conta que ela teria todas as permissões para fazer qualquer tipo de alteração no sistema. Parece correto isso?
+
+Para lidarmos com isso precisamos lidar com cada tipo de usuário e cada tipo de permissão, podemos atribuir isso por roles, ou no nível do usuário mesmo.
+
+
+Por exemplo:
+
+A usuária Marcela pode fazer todas as coisas no sistema, ela é uma gerente, porém a Marcela enquanto gerente disse que seus liderados não podem apagar dados e alguns outros só podem consultar algum tipo de dado muito específico.
+Como fariamos isso?
+
+Bom, podemos criar a seguinte estrutura de acordo com os modelos.
+precisamos criar um modelo de roles:
+Eu sugeriria apenas que tivesse 2 campos
+`role`
+```
+Nome da role
+Está Ativa?
+```
+`Permissão de role`:
+```
+identificação da role
+nome do modelo
+leitura?
+inserção?
+alteração?
+deleção?
+```
+um roles por usuário
+```
+id do usuário
+id da role
+```
+
+Você se lembra como fizemos o sistema de permissão de acesso?
+em cada serviço vai ser necessário fazer a implementação para descobrir se o usuário pode ou não acessar cada um deles. É apenas bem trabalhoso mas não é difícil.

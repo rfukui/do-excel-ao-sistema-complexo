@@ -1,30 +1,26 @@
 import database from '../src/models'
-
+const User = User
 class UserService {
   static async getAllUsers() {
     try {
-      return await database.User.findAll()
+      return await User.findAll()
     } catch (error) {
       throw error
     }
   }
+
   static async authenticate(req) {
       const {username, password} = req
-      const user = await database.User.findOne(
-        { where : {
-          name : username + "",
-          pass : password + ""
-        }}
+      const user = await User.findOne(
+        {where: {name: username + "", pass: password + ""}}
       )
-      if (user) {
-          const { name } = user
-          return { name }
-      }
+        return user ? { name : user.name } : undefined
+
   }
 
   static async addUser(newUser) {
     try {
-      return await database.User.create(newUser)
+      return await User.create(newUser)
     } catch (error) {
       throw error
     }
@@ -32,12 +28,12 @@ class UserService {
 
   static async updateUser(id, updateUser) {
     try {
-      const userToUpdate = await database.User.findOne({
+      const userToUpdate = await User.findOne({
         where: { id: Number(id) }
       })
 
       if (userToUpdate) {
-        await database.User.update(updateUser, { where: { id: Number(id) } })
+        await User.update(updateUser, { where: { id: Number(id) } })
 
         return updateUser
       }
@@ -49,7 +45,7 @@ class UserService {
 
   static async getUser(id) {
     try {
-      const theUser = await database.User.findOne({
+      const theUser = await User.findOne({
         where: { id: Number(id) }
       })
 
@@ -61,10 +57,10 @@ class UserService {
 
   static async deleteUser(id) {
     try {
-      const userToDelete = await database.User.findOne({ where: { id: Number(id) } })
+      const userToDelete = await User.findOne({ where: { id: Number(id) } })
 
       if (userToDelete) {
-        const deletedUser = await database.User.destroy({
+        const deletedUser = await User.destroy({
           where: { id: Number(id) }
         })
         return deletedUser
