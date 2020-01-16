@@ -308,7 +308,7 @@ O arquivo de configuração referencia um banco de dados chamado "new_store_deve
 ```
 $ docker-compose up db
 ```
-Agora que você subiu o banco de dados, é só criar todos os bancos que criamos anteriormente em _new_store_. Lembra como fizemos isso nos passos anteriores? Em caso de dúvida volte alguns passos para relembrar. Mas agora não precisa inserir nenhum cadastro de livro, como fizemos anteriormente, pois vamos fazer isso com modelos. 
+Agora que você subiu o banco de dados, é só criar todos os bancos que criamos anteriormente em _new_store_. Lembra como fizemos isso nos passos anteriores? Em caso de dúvida volte alguns passos para relembrar. Mas agora não precisa inserir nenhum cadastro de livro, como fizemos anteriormente, pois vamos fazer isso com modelos.
 
 Vamos criar agora o nosso primeiro modelo, usando uma _feature_ do Sequelize.
 No terminal, navegue até a pasta raiz `new_store`. Vamos usar a linha de comando para criar um *modelo* para cadastrar primeiro os autores, com os campos que já conhecemos do antigo banco (nome, se está vivo). Vamos começar pelos autores para podermos usar suas informações como *chaves estrangeiras* em outras tabelas. Então sempre criamos os modelos a partir do mais básico, depois o mais completo (dos que não têm chaves estrangeiras para os que têm):
@@ -393,7 +393,7 @@ Então vamos à tabela Books. Aqui vamos fazer um pouco diferente, escrevendo ta
 
 O modelo se chamará `Book` e a migration será a `create-books`. Você pode fazer direto no seu editor de código.
 
-`books.js`
+`book.js`
 ```js
 'use strict';
 module.exports = (sequelize, DataTypes) => {
@@ -409,7 +409,7 @@ module.exports = (sequelize, DataTypes) => {
 
 ```
 
-`create-books.js`
+`create-book.js`
 
 ```js
 'use strict';
@@ -515,10 +515,11 @@ Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `B
 
 Agora talvez você esteja achando um pouco exagerada (e tlvez um pouco confusa) a separação em tantos arquivos. Mas acredite, é muito melhor cada coisa estar em seu lugar certinho e muito bem separada, inclusive para manutenção e isolamento. Lembre-se que essa não é uma ***single file application*** e inclusive se você se deparar com isso em sua vida profissional, acredite, você estará em maus lençóis.
 
+Mas o que são esses serviços? eles a principio não existiam no modelo MVC, mas eles te ajudam em fazer, neste caso, o acesso aos modelos, não sendo o modelo acessado diretamente pelo controlador. É especificamente bom cria-los porque se em algum momento alterarmos o banco de dados não precisaremos alterar o controlador, a alteração passa a ser mais atômica, e com isso mais fácil de ser executada e encontrar possíveis bugs no sistema.
+
 Vamos criar o diretório de serviços dentro do diretório `server` com o nome `services`. Dentro de `services`, vamos criar o arquivo `AuthorService.js`, com o seguinte conteúdo:
 
-``./new_store/api/server/services/AuthorService.js`:`
-
+`./new_store/api/server/services/AuthorService.js`
 ```js
 import database from '../src/models'
 
@@ -591,7 +592,10 @@ export default AuthorService
 
 #### Controladores
 
+Controladores são os responsaveis pelas regras de negócio da sua aplicação, elas recebem as chamadas das rotas e fazem os tratamentos necessários nos retornos dos serviços, normalmente é no controlador que implementamos por exemplo as regras de acesso a uma rota específica.
+
 Agora vamos criar o controlador de autor.
+
 Para isso, criamos um diretório chamado `controllers` dentro do diretório `server`, e dentro dele criamos o arquivo `Authorcontroller.js`, com o seguinte conteúdo:
 
 ```js
@@ -755,6 +759,57 @@ Agora vamos rodar nossa migração com todas as alterações e executar nosso c�
 ```
 $ npx sequelize-cli db:migrate
 ```
+
+### Rotas
+
+As rotas são parecidas com a que criamos para o nosso segundo tutorial, mas como eu disse, precisamos separar bem as coisas dentro do sistema.
+
+vamos criar um diretório chamado `routes` dentro de `./api/server` e colocar o Arquivo `AuthorRoutes.js` que será o responsavel por determinar qual controlador cada rota chamará.
+
+Segue o arquivo:
+```js
+import { Router } from 'express'
+import AuthorController from '../controllers/AuthorController'
+
+const router = Router()
+router.get('/', AuthorController.getAllAuthors)
+router.post('/', AuthorController.addAuthor)
+router.get('/:id', AuthorController.getAuthor)
+router.put('/:id', AuthorController.updatedAuthor)
+router.delete('/:id', AuthorController.deleteAuthor)
+export default router
+
+```
+
+Você pode agora estranhar que apontamos tudo para o '/', mas calma, isso tem um motivo, vamos também alterar o arquivo principal, o `./api/index.js` da seguinte forma:
+
+```JS
+import express from 'express'
+import bodyParser from 'body-parser'
+import authorRoutes from './server/routes/AuthorRoutes';
+
+const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+const port = process.env.PORT || 3000;
+
+app.use('/api/authors', authorRoutes);
+
+// when a random route is inputed
+app.get('*', (req, res) => res.status(200).send({
+  message: 'Welcome to this API.',
+}));
+
+app.listen(port, () => {
+  console.log(`Server is running on PORT ${port}`);
+});
+
+module.exports = app
+
+```
+Note então que o arquivo recebeu o import da rota de autores e ele está definido para receber requisições em `/api/author`, o mesmo deve se repetir para todas as outras rotas.
 
 Depois disso basta reiniciar nosso container:
 
