@@ -96,7 +96,7 @@ Depois criaremos as tabelas de livros, autores e editoras fazendo suas ligaçõe
 CREATE TABLE publishers(
     id         SERIAL    PRIMARY KEY,
     name       CHAR(255) NOT NULL,
-    adress     CHAR(255) NULL,
+    address    CHAR(255) NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
 CREATE TABLE authors(
