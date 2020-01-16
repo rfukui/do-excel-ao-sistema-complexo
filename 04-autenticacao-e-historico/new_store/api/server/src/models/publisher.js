@@ -1,4 +1,6 @@
 'use strict';
+const sequelizeHistory = require('sequelize-history');
+
 module.exports = (sequelize, DataTypes) => {
   const Publisher = sequelize.define('Publisher', {
     name: DataTypes.STRING,
@@ -8,5 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     Publisher.hasMany(models.Book)
   };
 
-  return Publisher;
+  const PublisherHistory= sequelizeHistory(Publisher, sequelize)
+
+  return { Publisher, PublisherHistory };
+
 };

@@ -4,7 +4,7 @@
   "description": "New version of bookstore tutorial",
   "main": "index.js",
   "scripts": {
-    "test": "export NODE_ENV=test &&  sequelize db:migrate:undo:all  && sequelize db:migrate  && nyc --require @babel/register mocha ./api/test/*-test.js --timeout 20000 --exit",
+    "test": "export NODE_ENV=test &&  sequelize db:migrate:undo:all  && sequelize db:migrate  && nyc --require @babel/register ./**/*test.js --timeout 20000 --exit",
     "dev": "nodemon --exec babel-node ./api/index.js"
   },
   "author": "Ricardo Fukui",
@@ -21,6 +21,7 @@
     "pg-hstore": "^2.3.3",
     "sequelize": "^5.21.3",
     "sequelize-cli": "^5.5.1",
+    "sequelize-history": "^1.4.0",
     "sequelize-temporal": "^1.0.8"
   },
   "devDependencies": {

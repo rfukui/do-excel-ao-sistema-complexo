@@ -4,6 +4,8 @@ import authorRoutes from './server/routes/AuthorRoutes';
 import userRoutes from './server/routes/UserRoutes';
 const basicAuth = require('./server/services/basic-auth');
 const errorHandler = require('./server/services/error-handler');
+const cors = require('cors');
+
 const app = express();
 
 app.use(bodyParser.json());
@@ -14,6 +16,8 @@ const port = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
+
+app.use('/api/users', userRoutes);
 
 app.use(basicAuth)
 app.use('/api/authors', authorRoutes);

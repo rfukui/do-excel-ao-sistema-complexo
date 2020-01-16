@@ -3,7 +3,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_development",
-    "host": "db",
+    "host": "localhost",
     "dialect": "postgres",
     "operatorsAliases": false
   },

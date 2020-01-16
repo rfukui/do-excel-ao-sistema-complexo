@@ -14,7 +14,7 @@ services:
       - store-network
     depends_on:
       - db
-
+services:
   test:
     image: node:12-alpine
     container_name: new_store_api_test

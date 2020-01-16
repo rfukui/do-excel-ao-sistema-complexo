@@ -3,7 +3,8 @@ import database from '../src/models'
 class AuthorService {
   static async getAllAuthors() {
     try {
-      return await database.Author.findAll()
+      console.log(await database.sequelize.models.AuthorHistory.findAll())
+      return await database.sequelize.models.Author.findAll()
     } catch (error) {
       throw error
     }
@@ -11,7 +12,7 @@ class AuthorService {
 
   static async addAuthor(newAuthor) {
     try {
-      return await database.Author.create(newAuthor)
+      return await database.sequelize.models.Author.create(newAuthor)
     } catch (error) {
       throw error
     }
@@ -19,12 +20,12 @@ class AuthorService {
 
   static async updateAuthor(id, updateAuthor) {
     try {
-      const authorToUpdate = await database.Author.findOne({
+      const authorToUpdate = await database.sequelize.models.Author.findOne({
         where: { id: Number(id) }
       })
 
       if (authorToUpdate) {
-        await database.Author.update(updateAuthor, { where: { id: Number(id) } })
+        await database.sequelize.models.Author.update(updateAuthor, { where: { id: Number(id) } })
 
         return updateAuthor
       }
@@ -36,7 +37,7 @@ class AuthorService {
 
   static async getAuthor(id) {
     try {
-      const theAuthor = await database.Author.findOne({
+      const theAuthor = await database.sequelize.models.Author.findOne({
         where: { id: Number(id) }
       })
 
@@ -48,10 +49,10 @@ class AuthorService {
 
   static async deleteAuthor(id) {
     try {
-      const authorToDelete = await database.Author.findOne({ where: { id: Number(id) } })
+      const authorToDelete = await database.sequelize.models.Author.findOne({ where: { id: Number(id) } })
 
       if (authorToDelete) {
-        const deletedAuthor = await database.Author.destroy({
+        const deletedAuthor = await database.sequelize.models.Author.destroy({
           where: { id: Number(id) }
         })
         return deletedAuthor

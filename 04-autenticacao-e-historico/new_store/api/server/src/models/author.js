@@ -1,5 +1,7 @@
 'use strict';
-module.exports = (sequelize, DataTypes) => {
+const sequelizeHistory = require('sequelize-history');
+
+const Author = (sequelize, DataTypes) => {
   const Author = sequelize.define('Author', {
     name: DataTypes.STRING,
     is_alive: DataTypes.BOOLEAN
@@ -7,5 +9,9 @@ module.exports = (sequelize, DataTypes) => {
   Author.associate = function(models) {
     Author.hasMany(models.Book)
   };
-  return Author;
+  const AuthorHistory= sequelizeHistory(Author, sequelize)
+
+  return { Author, AuthorHistory };
 };
+
+module.exports = Author
