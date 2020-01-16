@@ -513,9 +513,11 @@ Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `B
 
 #### Serviços
 
-Agora talvez você esteja achando um pouco exagerada a separação em tantos arquivos, inclusive um pouco confuso, mas acredite, é muito melhor cada coisa estar em seu lugar certinho e muito bem separada, inclusive para manutenção e isolamento. Lembre-se isso não é um ***single file application*** e inclusive se você se deparar com isso em sua vida profissional, acredite, você estará em maus lençois.
+Agora talvez você esteja achando um pouco exagerada (e tlvez um pouco confusa) a separação em tantos arquivos. Mas acredite, é muito melhor cada coisa estar em seu lugar certinho e muito bem separada, inclusive para manutenção e isolamento. Lembre-se que essa não é uma ***single file application*** e inclusive se você se deparar com isso em sua vida profissional, acredite, você estará em maus lençóis.
 
-vamos criar o diretório de serviços dentro do diretório server com o nome services e dentro dela colocar o arquivo `AuthorService.js` com o seguinte conteudo:
+Vamos criar o diretório de serviços dentro do diretório `server` com o nome `services`. Dentro de `services`, vamos criar o arquivo `AuthorService.js`, com o seguinte conteúdo:
+
+``./new_store/api/server/services/AuthorService.js`:`
 
 ```js
 import database from '../src/models'
@@ -588,7 +590,9 @@ export default AuthorService
 ```
 
 #### Controladores
-Agora vamos criar o controlador de autor, criamos um diretório chamado controllers dentro do diretório server e dentro dele criamos o arquivo `Authorcontroller.js` com o seguinte conteudo:
+
+Agora vamos criar o controlador de autor.
+Para isso, criamos um diretório chamado `controllers` dentro do diretório `server`, e dentro dele criamos o arquivo `Authorcontroller.js`, com o seguinte conteúdo:
 
 ```js
 import AuthorService from '../services/AuthorService'
@@ -700,9 +704,9 @@ class AuthorController {
 export default AuthorController
 
 ```
-Como você observa eu importei no começo do arquivo o utils, cuidado com a utilização dele, normalmente utils são arquivos que não pensamos direito para criar e quando não sabemos onde colocar algo colocamos lá dentro. Talvez eu encontrasse um nome melhor para este caso, mas por enquanto fica utils nesmo(na edição 2.0 deste tutorial ele terá um nome melhor, me cobrem).
 
-o arquivo de utils ficará dentro do diretorio utils (`./api/server/utils/Utils.js`) e terá o seguinte conteudo :
+Como você observa eu importei no começo do arquivo o utils, mas ele ainda não existe. Vamos criá-lo agora também.
+O arquivo de utils ficará dentro do diretório utils (`./api/server/utils/Utils.js`) e terá o seguinte conteúdo:
 
 ```js
 export default class Util {
@@ -743,26 +747,28 @@ export default class Util {
   }
 }
 ```
-Agora vamos rodar nossa migração com todas as alterações e executar nosso codigo:
+
+Cuidado com a utilização do `Utils`! Normalmente utils são arquivos que não pensamos direito para criar e quando não sabemos onde colocar alguma função da aplicação, colocamos lá dentro. Talvez para a versão 2.0 desse tutorial ele tenha um nome melhor (me cobrem), mas por enquanto fica utils mesmo.
+
+Agora vamos rodar nossa migração com todas as alterações e executar nosso código:
 
 ```
 $ npx sequelize-cli db:migrate
 ```
 
-Depois disso basta reinicar nosso container:
+Depois disso basta reiniciar nosso container:
 
 ```
-$ docker-composer up dev
+$ docker-compose up dev
 ```
 
-Você tem agora sua primeira faze da api rodando, com exatamente todos os comandos necessários para criar, editar, consultar e apagar um autor, baseado neste caso você deve conseguir fazer o restante ;)
-
+Agora temos a primeira fase na nossa API rodando, com exatamente todos os comandos necessários para criar, editar, consultar e apagar um autor. A partir daqui, você deve conseguir fazer o que falta para as editoras e os livros ;)
 
 ### Escrevendo testes
 
-Vamos criar alguns testes neste momento, um teste que podemos dizer que é um teste de integração
+Vamos criar alguns testes de integração. DIFERENÇA PARA TESTES UNITÁRIOS
 
-vamos instalar as bibliotecas de testes:
+Antes de tudo, instalar as bibliotecas de testes:
 ```
 npm install --save-dev mocha chai chai-http nyc
 ```
@@ -963,20 +969,25 @@ describe('Testing the author endpoints:', () => {
 })
 
 ```
-O teste é o que chamamos de documentação viva de um programa, toda vez que um programa é mudado ele deve ter um teste dizendo como é esperado que o programa se comporte, e aqui podemos ver isso claramente. para cada um dos meus endpoints de autor eu tenho o que eu espero acesso cada um dos endpoints, incluindo os casos de erro.
 
-Este é um bom exemplo de como testes podem testar todo um código sem precisar de testes unitários. Testes devem sempre ser escritos se fizerem sentido, não fazia sentido fazer testes de códigos gerados automaticamente pelos frameworks, devemos acreditar que eles funcionam sendo responsabilidade dele escrever os testes para eles mesmos.
+O teste é o que chamamos de documentação viva de um programa. Toda vez que um programa é mudado, ele deve ter um teste dizendo como é esperado que o programa se comporte, e aqui podemos ver isso claramente. Para cada um dos endpoints de autor, temos um teste dizendo o que se espera que aconteça, incluindo os casos de erro.
 
-Vamos editar novamente o `package.json` e incluir a parte dos testes.
+Este é um bom exemplo de como testes podem testar todo um código sem precisar de testes unitários. Testes devem sempre ser escritos se fizerem sentido; nesse caso, não fazia sentido fazer testes para os códigos gerados automaticamente pelos frameworks. Só devemos acreditar que eles funcionam, pois é responsabilidade de cada *framework* ou biblioteca escrever os testes para suas próprias funcionalidades.
+
+Vamos editar novamente o `package.json` e incluir a parte dos testes:
 
 ```json
 "test": "export NODE_ENV=test &&  sequelize db:migrate:undo:all  && sequelize db:migrate  && nyc --require @babel/register mocha ./api/test/*-test.js --timeout 20000 --exit",
 ```
-Estamos criando a migração do teste e com isso teremos um banco completamente vazio, depois disso executamos os testes.
+Veja o primeiro comando do teste: ele diz que vamos usar o ENV (*environment*, ambiente) chamado `test`. Caso não se lembre onde está isso no código, dê uma olhada no arquivo `config/config.js`. A partir daí, criamos a migração do teste e com isso teremos um banco completamente vazio, e depois disso executamos os testes. A intenção é ter um banco somente para isso, fazer os testes sem mexer no banco de desenvolvimento, ou pior, de produção.
 
-vamos também criar um docker compose para os testes.
+Vamos também adicionar a parte de testes no `docker-compose`.
 
 ```yml
+services:
+.
+.
+.
   test:
     image: node:12-alpine
     container_name: new_store_api_test
@@ -991,6 +1002,6 @@ vamos também criar um docker compose para os testes.
     depends_on:
       - db
 ```
-Note que a porta de saida do teste é a 3001, mesmo rodando internamente na porta 3000, isso acontece porque compartilhamos a porta como "localhost" no nosso computador e não conseguimos rodar 2 aplicações na mesma porta.
+Note que a porta de saída do teste é a 3001, mesmo rodando internamente na porta 3000. Isso acontece porque compartilhamos a porta como "localhost" no nosso computador e não conseguimos rodar 2 aplicações na mesma porta.
 
-Acredito que a partir daqui conseguiremos fazer o serviço completo para todas as outras APIs necessárias para executar seu projeto.
+A partir daqui já podemos fazer o serviço completo para todas as outras APIs necessárias para executar seu projeto.
