@@ -8,7 +8,7 @@ Os comandos DDL são classificados em quatro tipos, CREATE, DROP, ALTER e TRUNCA
 
 Neste curso trabal haremos apenas com criação e alteração de banco de dados e tabelas. Mas elas podem existir para os mais variados tipos de *coisas* que um banco de dados pode ter. Caso queira se aprofundar mais neste assunto recomendo estudar bastante estrutura de dados e adminstração de servidores e bancos. É um material bem vasto e ainda hoje um dos empregos mais bem pagos da área de Tecnologia da informação.
 
-O postgres usa um pseudo tipo (um pseudo tipo é neste caso um *alias* para um tipo mais complexo com uma série de regras) para criar valores auto-incrementáveis. ele é o SERIAL, aconcelho ler este [material](https://www.postgresqltutorial.com/postgresql-serial/) para entender melhor.
+O postgres usa um pseudo tipo (um pseudo tipo é neste caso um *alias* para um tipo mais complexo com uma série de regras) para criar valores auto-incrementáveis. ele é o SERIAL, aconselho ler este [material](https://www.postgresqltutorial.com/postgresql-serial/) para entender melhor.
 
 Exemplo de criação de tabela:
 
@@ -59,8 +59,10 @@ SELECT * FROM books where name like '%Pedro%';
 SELECT * FROM books b
 INNER JOIN authors a
 ON b."authorsID" = a."id"
-where name like '%Pedro%';
+where a.name like '%Pedro%';
 -- traz todo o conteudo das 2 tabelas que o nome contenha Pedro
+-- a e b são apelidos para authors e books respectivamente
+
 
 SELECT a.name, count(a.name) FROM "Authors" a
 INNER JOIN "books" b
@@ -112,3 +114,10 @@ Delete from books
 where name = 'Jose de alencar';
 --apaga todas as linhas da tabela que o nome seja 'Jose de alencar'
 ```
+
+
+### Particularidades do SQL
+
+Acredito que você tenha notado que foi misturado aspas duplas `"` e aspas simples `'`, mas elas não são a mesma coisa. As aspas simples simbolizam strings e as aspas duplas são para identificação de elementos do banco, como banco de dados, tabelas, campos, sequences entre outros campos.
+
+A Regra para quando se precisa usar aspas duplas varia de banco para banco, mas no caso do Postgres sempre que um destes elementos tiver qualquer letra maiúscula deve se utilizar as aspas duplas, eu aconselho na dúvida se uma *query* deve ou não ser escrita com aspas duplas as utilizar, não vai invalidar seu sql.
