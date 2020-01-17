@@ -220,3 +220,5 @@ select * from authors;
 o ROLLBACK fez o que chamamos de "voltar ao ponto de início da transação". Isso é muito importante para quando trabalhamos com uma série de dados em sequência para serem salvos e não podemos nos dar ao luxo de salvar parcialmente esses dados. Assim, ou todos são inseridos ou devemos voltar ao estado anterior.
 
 Baseado nestes dados crie também as editoras e livros, esteja livre para inserir quantos livros quiser e quantas editoras e autores quiser também :)
+
+Se interessou e quer entender mais como funcionam os comandos de banco? Dá uma olhada nas leituras suplementares, lá tem uma lista melhor e mais completa de comandos e como funcionam.
