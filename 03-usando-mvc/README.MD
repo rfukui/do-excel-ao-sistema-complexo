@@ -391,7 +391,7 @@ Agora é com você! Utilizando as ferramentas de linha de comando do Sequelize, 
 
 Então vamos à tabela Books. Aqui vamos fazer um pouco diferente, escrevendo tanto o modelo quanto a migração de forma manual. Não deve ser difícil, uma vez que os arquivos que o Sequelize criou pra gente já dão uma "cola" de como eles devem ser.
 
-O modelo se chamará `Book` e a migration será a `create-books`. Você pode fazer direto no seu editor de código.
+O modelo se chamará `Book` e a migration será a `create-book`. Você pode fazer direto no seu editor de código.
 
 `book.js`
 ```js
@@ -513,9 +513,9 @@ Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `B
 
 #### Serviços
 
-Agora talvez você esteja achando um pouco exagerada (e tlvez um pouco confusa) a separação em tantos arquivos. Mas acredite, é muito melhor cada coisa estar em seu lugar certinho e muito bem separada, inclusive para manutenção e isolamento. Lembre-se que essa não é uma ***single file application*** e inclusive se você se deparar com isso em sua vida profissional, acredite, você estará em maus lençóis.
+Agora talvez você esteja achando um pouco exagerada (e talvez um pouco confusa) a separação em tantos arquivos. Mas acredite, é muito melhor cada coisa estar em seu lugar certinho e muito bem separada, inclusive para manutenção e isolamento. Lembre-se que essa não é uma ***single file application*** e inclusive se você se deparar com isso em sua vida profissional, acredite, você estará em maus lençóis.
 
-Mas o que são esses serviços? eles a principio não existiam no modelo MVC, mas eles te ajudam em fazer, neste caso, o acesso aos modelos, não sendo o modelo acessado diretamente pelo controlador. É especificamente bom cria-los porque se em algum momento alterarmos o banco de dados não precisaremos alterar o controlador, a alteração passa a ser mais atômica, e com isso mais fácil de ser executada e encontrar possíveis bugs no sistema.
+Mas o que são esses serviços? Eles a princípio não existiam no modelo MVC, mas eles te ajudam em fazer, neste caso, o acesso aos modelos, não sendo o modelo acessado diretamente pelo controlador (já vamos falar mais dos controladores). É especificamente bom criá-los porque, se em algum momento alterarmos o banco de dados, não precisaremos alterar o controlador. Ou seja, alteração passa a ser mais atômica, e com isso mais fácil de ser executada e encontrar possíveis bugs no sistema.
 
 Vamos criar o diretório de serviços dentro do diretório `server` com o nome `services`. Dentro de `services`, vamos criar o arquivo `AuthorService.js`, com o seguinte conteúdo:
 
@@ -592,7 +592,7 @@ export default AuthorService
 
 #### Controladores
 
-Controladores são os responsaveis pelas regras de negócio da sua aplicação, elas recebem as chamadas das rotas e fazem os tratamentos necessários nos retornos dos serviços, normalmente é no controlador que implementamos por exemplo as regras de acesso a uma rota específica.
+Controladores são os responsáveis pelas regras de negócio da sua aplicação. Elas recebem as chamadas das rotas e fazem os tratamentos necessários nos retornos dos serviços. Normalmente é no controlador que implementamos, por exemplo, as regras de acesso a uma rota específica.
 
 Agora vamos criar o controlador de autor.
 
@@ -762,9 +762,9 @@ $ npx sequelize-cli db:migrate
 
 ### Rotas
 
-As rotas são parecidas com a que criamos para o nosso segundo tutorial, mas como eu disse, precisamos separar bem as coisas dentro do sistema.
+As rotas são parecidas com as que criamos para o tutorial anterior (aquele do *single file application*), mas agora temos que separar bem as coisas dentro do sistema.
 
-vamos criar um diretório chamado `routes` dentro de `./api/server` e colocar o Arquivo `AuthorRoutes.js` que será o responsavel por determinar qual controlador cada rota chamará.
+Vamos criar um diretório chamado `routes` dentro de `./api/server` e, dentro dele, criar o arquivo `AuthorRoutes.js`, que será o responsável por determinar qual controlador cada rota chamará.
 
 Segue o arquivo:
 ```js
@@ -781,7 +781,8 @@ export default router
 
 ```
 
-Você pode agora estranhar que apontamos tudo para o '/', mas calma, isso tem um motivo, vamos também alterar o arquivo principal, o `./api/index.js` da seguinte forma:
+Se lermos o código acima, dá pra ver que está tudo apontando para o '/'. Como assim?
+Vamos também alterar o arquivo principal, o `./api/index.js`, aí tudo vai fazer sentido. Faça da seguinte forma:
 
 ```JS
 import express from 'express'
@@ -797,9 +798,9 @@ const port = process.env.PORT || 3000;
 
 app.use('/api/authors', authorRoutes);
 
-// when a random route is inputed
+// quando recebe uma rota não listada
 app.get('*', (req, res) => res.status(200).send({
-  message: 'Welcome to this API.',
+  message: 'Boas-vindas à API!',
 }));
 
 app.listen(port, () => {
@@ -809,7 +810,7 @@ app.listen(port, () => {
 module.exports = app
 
 ```
-Note então que o arquivo recebeu o import da rota de autores e ele está definido para receber requisições em `/api/author`, o mesmo deve se repetir para todas as outras rotas.
+Note que o arquivo recebeu o `import` do arquivo da rota de autores, e o método `app.use` define a rota `/api/author` para receber as requisições de autor. Ou seja: todas as rotas que estão no arquivo `AuthorRoutes.js` como "/" na verdade estão apontando (como você já deve ter concluído) para `/api/author`. O mesmo deve se repetir para todas as outras rotas.
 
 Depois disso basta reiniciar nosso container:
 
@@ -817,11 +818,14 @@ Depois disso basta reiniciar nosso container:
 $ docker-compose up dev
 ```
 
+Hora de usar o Postman para ver as rotas funcionando! 
+Use-o para enviar requisições `GET` para http://localhost:3000/ e http://localhost:3000/api/authors e veja o que acontece! Consegue localizar no código os trechos correspondentes às respostas dessas requisições? 
+
 Agora temos a primeira fase na nossa API rodando, com exatamente todos os comandos necessários para criar, editar, consultar e apagar um autor. A partir daqui, você deve conseguir fazer o que falta para as editoras e os livros ;)
 
 ### Escrevendo testes
 
-Vamos criar alguns testes de integração. DIFERENÇA PARA TESTES UNITÁRIOS
+Vamos criar alguns testes de integração.
 
 Antes de tudo, instalar as bibliotecas de testes:
 ```
