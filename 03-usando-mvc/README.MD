@@ -509,6 +509,8 @@ publisherId: {
 ```
 Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `Books`, através da chave (_key_) `id`.
 
+Para entender um pouco mais sobre migrações e associações, dê uma olhada na parte de leituras suplementares, está tudo lá.
+
 ### Criando nossos serviços controladores e rotas
 
 #### Serviços
