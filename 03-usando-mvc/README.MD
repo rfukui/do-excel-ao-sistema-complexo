@@ -1,3 +1,5 @@
+## Criando Serviços usando MVC
+
 Ok, agora seu tio já tem uma API que pode ser consumida e alimentada, mas ela ainda tem problemas.
 
 Da forma como está funcionando atualmente é possível, por exemplo, causar um estrago no banco de dados usando um processo hacker bem conhecido como [SQL INJECTION](https://www.devmedia.com.br/sql-injection/6102) e, vamos concordar, já estudamos bastante orientação a objetos e sabemos que no nosso código anterior não tem muito disso.
@@ -279,7 +281,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_development",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   },
@@ -287,7 +289,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_test",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   },
@@ -295,7 +297,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_production",
-    "host": "127.0.0.1",
+    "host": "db",
     "dialect": "postgres",
     "operatorsAliases": false
   }
@@ -334,11 +336,51 @@ module.exports = (sequelize, DataTypes) => {
 ```
 O que está acontecendo nesse código? Leia cada linha com calma, e quando ver algum método que não reconheça (por exemplo, o método `.define` do Sequelize), faça uma pesquisa na documentação ou no Google mesmo. Depois, se quisermos, podemos modificar algumas coisas nele.
 
-Agora, baseado nisso, criaremos as migrações necessárias da seguinte forma (até este momento para apenas uma tabela, a `Author`):
+Agora, baseado nisso, criaremos as migrações necessárias da seguinte forma (até este momento para apenas uma tabela, a `Author`), vamos alterar o script de inicialização do `package.json` e também nosso `docker-compose.yml`.
 
+`package.json`:
+```json
+"scripts": {
+  "migrate": "npx sequelize-cli db:migrate",
+  "test": "export NODE_ENV=test &&  sequelize db:migrate:undo:all  && sequelize db:migrate  && nyc --require @babel/register mocha ./api/test/*-test.js --timeout 20000 --exit",
+  "dev": "nodemon --exec babel-node ./api/index.js"
+}
 ```
-$ npx sequelize-cli db:migrate
+
+`docker-compose.yml`:
+```yml
+services:
+  dev:
+    image: node:12-alpine
+    container_name: new_store_api_dev
+    command:  sh -c "npm run migrate && npm run dev"
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/app:cached
+    networks:
+      - store-network
+    depends_on:
+      - db
+
+  test:
+    image: node:12-alpine
+    container_name: new_store_api_test
+    command:  sh -c "npm run migrate && npm run test"
+    working_dir: /app
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./:/app:cached
+    networks:
+      - store-network
+    depends_on:
+      - db
 ```
+
+Foi criado neste momento um script que toda vez que você iniciar seu container a primeira coisa que ele irá fazer é executar a migração, com isso não precisaremos nos preocupar em executar de forma individual, basta baixar e subir o contaier. um processo que costuma ser bem rápido.
+
 Então se logarmos no banco (volte alguns passos se tiver que relembrar como) e procurarmos a tabela, veremos que ela foi criada com alguns campos extras, o que chamamos de campos de auditoria e o de identificação; os ORMs costumam fazer desta forma. Notamos também que a tabela está com o nome no plural.
 
 ```
