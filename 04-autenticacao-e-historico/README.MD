@@ -2,28 +2,28 @@
 
 ### Autenticação
 
-Existem várias formas de se fazer autenticações em aplicações web, mesmo em APIs, a forma mais básica é com o que chamamos de basic-auth precisamos de poucas coisas para ele funcionar.
+Existem várias formas de se fazer autenticações em aplicações web, mesmo em APIs. A forma mais básica é com o que chamamos de basic-auth e precisamos de poucas coisas para ele funcionar.
 
-Vamos tomar por base nossa api anterior.
+Vamos tomar por base nossa API anterior.
 
-precisamos primeiro agora instalar um pacote cors
+precisamos primeiro instalar um pacote CORS:
 
 ```
 $ npm install cors
 ```
-Em sequência vamos criar o model de usuários
+Em sequência vamos criar o model de usuários:
 
 ```
 $ npx sequelize-cli model:create --name User --attributes name:string,pass:string && npx sequelize-cli db:migrate
 ```
 
-### ATENÇÃO!!!
+### ATENÇÃO!
 **Este é um caso de estudo e a senha está sendo gravada como um texto simples, não faça isso nunca em produção.**
 
 
-Vamos criar agora a controladora e o serviço dele.
+Vamos criar agora o controlador e o serviço dele.
 
-Usaremos a principio a mesma estrutura para criar os serviços e controladores de usuários, agora vem a diferença, vamos criar o serviço de Autenticação também:
+Usaremos a princípio a mesma estrutura para criar os serviços e controladores de usuários. Agora vem a diferença: também vamos criar o serviço de Autenticação:
 
 ```js
 
@@ -55,7 +55,7 @@ static async authenticate(req, res, next) {
 ```
 Com isso teremos uma autenticação básica usando o seu password e usuário com basic auth.
 
-também precisamos alterar nosso `./api/index.js` para que ele receba as rotas novas e para que as rotas passem por autenticação:
+Também precisamos alterar nosso `./api/index.js` para que ele receba as rotas novas e para que as rotas passem por autenticação:
 
 ```js
 import express from 'express'
@@ -90,7 +90,7 @@ app.listen(port, () => {
 module.exports = app
 
 ```
-criamos também os serviços de basicAuth e errorHandler, para podermos lidar direito com nossas apis seguras, lembre-se de separar sempre o máximo possível seu código.
+criamos também os serviços de basicAuth e errorHandler, para podermos lidar direito com nossas APIs seguras. Lembre-se de separar sempre o máximo possível seu código.
 
 `./api/server/services/basic-auth.js`
 
@@ -121,7 +121,7 @@ async function basicAuth(req, res, next) {
 ```
 Aqui ele verifica se um path é livre, neste caso o que podemos fazer a validação de usuários sem precisar fazer o basicAuth e trava todas as outras rotas para necessidade de autenticação.
 
-também temos o serviço que trata os erros:
+Também temos o serviço que trata os erros:
 `./api/server/services/error-handler.js`
 
 ```js
@@ -135,9 +135,9 @@ function errorHandler(err, req, res, next) {
 }
 
 ```
-Assim ele tem agora autenticação basica.
+Assim seu sistema tem agora um autenticação básica.
 
-Ponto de atenção. é necessário criar um usuário caso não haja nenhum usuário não será possível fazer conexões. Você pode criar um usuário padrão e colocar ele de forma manual no banco de dados, ou pode criar um usuário fake dentro do sistema, por exemplo:
+Ponto de atenção: é necessário criar um usuário; caso não haja nenhum usuário não será possível fazer conexões. Você pode criar um usuário padrão e colocar ele de forma manual no banco de dados, ou pode criar um usuário fake dentro do sistema, por exemplo:
 
 ```js
 static async authenticate(req) {
@@ -162,9 +162,9 @@ Essa é uma prática válida para ambientes de desenvolvimento, mas cuidado semp
 
 ### Criando um histórico de alteração de bancos de dados
 
-Nosso sistema está ficando bem interessante. Ele já tem autenticação e agora vamos colocar um histórico para todas as tabelas, eles são importantes porque conseguimos salvar todos os estados que o banco passa, eles são importantes, tanto para tentar descobrir possíveis bugs em suas aplicações quanto para descobrir se houveram transações indesejadas no seu banco.
+Nosso sistema está ficando bem interessante. Ele já tem autenticação e agora vamos colocar um histórico para todas as tabelas. Eles são importantes porque conseguimos salvar todos os estados que o banco passa, tanto para tentar descobrir possíveis bugs em suas aplicações quanto para descobrir se houve transações indesejadas no seu banco.
 
-Para nosso sistema de histórico vamos utilizar o `sequelize-history` em conjunto com o sequelize-cli para gerar nossas tabelas historicas no banco.
+Para nosso sistema de histórico vamos utilizar o `sequelize-history` em conjunto com o sequelize-cli para gerar nossas tabelas históricas no banco.
 
 Vamos começar instalando o `sequelize-history`:
 
@@ -172,7 +172,7 @@ Vamos começar instalando o `sequelize-history`:
 $ npm i sequelize-history --save
 ```
 
-É bem intuitivo usar o `sequelize-history`, basta nos modelos existentes importa-lo e fazer uma pequena alteração no `index.js` do model:
+É bem intuitivo usar o `sequelize-history`, basta importá-lo nos modelos existentes e fazer uma pequena alteração no `index.js` do model:
 
 ```js
 import fs from 'fs'
@@ -242,7 +242,7 @@ export default db
 
 ```
 
-Podem perceber que mudamos a forma como importamos os models de forma individual neste trecho do código:
+Perceba que mudamos a forma como importamos os models de forma individual neste trecho do código:
 
 ```js
 
@@ -285,9 +285,9 @@ module.exports = Author
 
 ```
 
-Nada muito diferente, apenas como podem ver, incluimos o AuthorHistory como um sequelizeHistory e exportamos ambos, é bem simples, porém ainda falta criar as migrations deles.
+Nada muito diferente! Apenas, como podem ver, incluímos o AuthorHistory como um sequelizeHistory e exportamos ambos. Falta apenas criar as migrations.
 
-aqui segue o exemplo da migração de autores:
+Aqui segue o exemplo da migração de autores:
 
 `create-author-history.js`
 ```js
@@ -327,28 +327,27 @@ module.exports = {
 };
 ```
 
-Lembre-se que os nomes seguem padrões predeterminados. Você precisa criar todos os campos que já existem nas tabelas e mais 2 campos, o modelId e o id e tudo funcionará magicamente.
+Lembre-se que os nomes seguem padrões predeterminados. Você precisa criar todos os campos que já existem nas tabelas e mais 2 campos, o modelId e o id, e tudo funcionará magicamente.
 
-Agora tente implementar um serviço na sua api que retorne o histórico de um autor com a seguinte url `/api/authors/:id/history`, lembre-se que este id não é o id do historico e sim do autor.
+Agora tente implementar um serviço na sua API que retorne o histórico de um autor com a seguinte url `/api/authors/:id/history`. Lembre-se que este `id` não é o id do histórico e sim do autor.
 
+### Níveis de permissão
 
-### Niveis de permissão
+Para trabalharmos com níveis de permissão, também conhecidos como "roles", precisamos alterar um pouco nossos modelos e criar ainda mais complexidade ao sistema.
 
-Para trabalharmos com níveis de permissão, também conhecida como Roles precisamos alterar um pouco nossos modelos e criar ainda mais complexidade ao sistema.
+Pense que no mundo ideal todo mundo é bem honesto, mas estamos falando sobre sistemas de informações, logo existe também a falha humana. Imagine que bastasse qualquer pessoa estar logada numa determinada conta e ela teria todas as permissões para fazer qualquer tipo de alteração no sistema. Não parece um pouco arriscado?
 
-Pensem que no mundo ideal todo mundo é bem honesto, mas estamos falando sobre sistemas de informações, logo existe também a falha humana, imagina que qualquer pessoa bastasse estar logada numa determinada conta que ela teria todas as permissões para fazer qualquer tipo de alteração no sistema. Parece correto isso?
-
-Para lidarmos com isso precisamos lidar com cada tipo de usuário e cada tipo de permissão, podemos atribuir isso por roles, ou no nível do usuário mesmo.
-
+Para lidarmos com isso precisamos lidar com cada tipo de usuário e cada tipo de permissão. Podemos atribuir isso por roles, ou no nível do usuário mesmo.
 
 Por exemplo:
 
-A usuária Marcela pode fazer todas as coisas no sistema, ela é uma gerente, porém a Marcela enquanto gerente disse que seus liderados não podem apagar dados e alguns outros só podem consultar algum tipo de dado muito específico.
-Como fariamos isso?
+A usuária Marcela pode fazer todas as operações no sistema, pois é a gerente. Porém Marcela, enquanto gerente, quer que seus liderados não possam apagar dados e alguns outros só possam consultar algum tipo de dado muito específico.
+Como faríamos isso?
 
-Bom, podemos criar a seguinte estrutura de acordo com os modelos.
-precisamos criar um modelo de roles:
-Eu sugeriria apenas que tivesse 2 campos
+Bom, podemos criar a seguinte estrutura de `roles`, de acordo com os modelos.
+
+Sugerimos que essa estrutura tenha 2 campos:
+
 `role`
 ```
 Nome da role
@@ -363,11 +362,11 @@ inserção?
 alteração?
 deleção?
 ```
-um roles por usuário
+um role por usuário
 ```
 id do usuário
 id da role
 ```
 
 Você se lembra como fizemos o sistema de permissão de acesso?
-em cada serviço vai ser necessário fazer a implementação para descobrir se o usuário pode ou não acessar cada um deles. É apenas bem trabalhoso mas não é difícil.
+Em cada serviço vai ser necessário fazer a implementação para descobrir se o usuário pode ou não acessar cada um deles. Pode dar um pouquinho de trabalho, mas é uma prática super útil para você entender cada vez mais como funciona o trabalho com um banco de dados.

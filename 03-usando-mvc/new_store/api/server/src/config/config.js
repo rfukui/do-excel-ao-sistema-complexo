@@ -11,7 +11,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_test",
-    "host": "db",
+    "host": "localhost",
     "dialect": "postgres",
     "operatorsAliases": false
   },
@@ -19,7 +19,7 @@ module.exports = {
     "username": "postgres",
     "password": null,
     "database": "new_store_production",
-    "host": "db",
+    "host": "localhost",
     "dialect": "postgres",
     "operatorsAliases": false
   }

@@ -551,6 +551,8 @@ publisherId: {
 ```
 Dessa forma, estamos associando as tabelas `Publishers` e `Authors` à tabela `Books`, através da chave (_key_) `id`.
 
+Para entender um pouco mais sobre migrações e associações, dê uma olhada na parte de leituras suplementares, está tudo lá.
+
 ### Criando nossos serviços controladores e rotas
 
 #### Serviços
@@ -1070,7 +1072,8 @@ describe('Testing the author endpoints:', () => {
 })
 
 ```
-Estes são testes de integração, eles recevem esse nome porque tratam de um fluxo que passa por várias rotinas do programa, ao contrário dos testes unitários, que se preocupam apenas com a sua função mais básica, sem considerar todo o fluxo, ou boa parte dele.
+Estes são testes de integração, eles recebem esse nome porque tratam de um fluxo que passa por várias rotinas do programa, ao contrário dos testes unitários, que se preocupam apenas com a sua função mais básica, sem considerar todo o fluxo, ou boa parte dele.
+
 O teste é o que chamamos de documentação viva de um programa. Toda vez que um programa é mudado, ele deve ter um teste dizendo como é esperado que o programa se comporte, e aqui podemos ver isso claramente. Para cada um dos endpoints de autor, temos um teste dizendo o que se espera que aconteça, incluindo os casos de erro.
 
 Este é um bom exemplo de como testes podem testar todo um código sem precisar de testes unitários. Testes devem sempre ser escritos se fizerem sentido; nesse caso, não fazia sentido fazer testes para os códigos gerados automaticamente pelos frameworks. Só devemos acreditar que eles funcionam, pois é responsabilidade de cada *framework* ou biblioteca escrever os testes para suas próprias funcionalidades.

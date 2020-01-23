@@ -4,7 +4,7 @@ services:
   dev:
     image: node:12-alpine
     container_name: new_store_api_dev
-    command:  sh -c "npm run migrate && npm run dev"
+    command: sh -c "npm run migrate && npm run dev"
     working_dir: /app
     ports:
       - "3000:3000"
@@ -18,7 +18,7 @@ services:
   test:
     image: node:12-alpine
     container_name: new_store_api_test
-    command:  sh -c "npm run migrate && npm run test"
+    command: sh -c "npm run migrate && npm run test"
     working_dir: /app
     ports:
       - "3001:3000"
