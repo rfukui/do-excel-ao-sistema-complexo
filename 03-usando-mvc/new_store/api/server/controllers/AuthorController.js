@@ -20,8 +20,7 @@ class AuthorController {
   }
 
   static async addAuthor(req, res) {
-    console.log(req.body.name, req.body.is_alive)
-    if (!req.body.name || !req.body.is_alive ) {
+    if (!req.body.name || !typeof(req.body.is_alive)==='boolean' ) {
       util.setError(400, 'Please provide complete details')
       return util.send(res)
     }
@@ -33,8 +32,7 @@ class AuthorController {
     } catch (error) {
       util.setError(400, error.message)
       return util.send(res)
-    }
-  }
+    }}
 
   static async updatedAuthor(req, res) {
     const alteredAuthor = req.body
