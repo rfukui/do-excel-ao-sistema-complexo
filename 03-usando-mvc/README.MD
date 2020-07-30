@@ -6,19 +6,17 @@ Da forma como está funcionando atualmente é possível, por exemplo, causar um 
 
 Vamos começar a fazer isso de forma bem mais profissional, usando um [ORM](https://pt.wikipedia.org/wiki/Mapeamento_objeto-relacional) para acessar os dados. Vamos separar as partes da aplicação em uma arquitetura do tipo [MVC](https://pt.wikipedia.org/wiki/MVC), com rotas bem definidas, e obviamente deixaremos de ter uma aplicação tipo _single file application_ (afinal de contas já sabemos trabalhar em estruturas de arquivo mais complexas e não precisamos escrever todo nosso código num só arquivo `script.js`, `app.js` ou `index.js`).
 
-Vamos começar a fazer isso de forma bem mais profissional, usando um [ORM](https://pt.wikipedia.org/wiki/Mapeamento_objeto-relacional) para acessar os dados. Vamos separar as partes da aplicação em uma arquitetura do tipo [MVC](https://pt.wikipedia.org/wiki/MVC), com rotas bem definidas, e obviamente deixaremos de ter uma aplicação tipo _single file application_ (afinal de contas já sabemos trabalhar em estruturas de arquivo mais complexas e não precisamos escrever todo nosso código num só arquivo `script.js`, `app.js` ou `index.js`).
-
 Primeira coisa: Vamos começar um novo projeto usando também o Sequelize, além de todas as outras ferramentas que já tínhamos instalado.
 
-Aí você deve estar se perguntando: por que não apenas adcionar o Sequelize no projeto e refatorar?
-O motivo é simples: é muito mais fácil recomeçar um projeto do jeito certo que tentar arrumar um projeto capenga, e em programação precisamos praticar sempre o desapego afetivo ao código. Então partiu jogar código fora e fazer do zero, agora de forma melhor.
+Aí você deve estar se perguntando: por que não apenas adicionar o Sequelize no projeto e refatorar?
+O motivo é simples: é muito mais fácil recomeçar um projeto do jeito certo do que tentar arrumar um projeto capenga, e em programação precisamos praticar sempre o desapego afetivo ao código. Então partiu jogar código fora e fazer do zero, agora de forma melhor.
 
 Vamos criar uma nova pasta de projeto chamada `new_store` (fora da pasta que trabalhamos antes!) e começar a desenvolver dentro dela.
 
 ```
 $ mkdir new_store && cd new_store && npm init
 ```
-Com isso iniciamos nosso novo projeto e agora vamos instalar o que precisamos, começando pelas dependências e criando um novo index.js
+Com isso iniciamos nosso novo projeto e agora vamos instalar o que precisamos, começando pelas dependências e criando um novo `index.js`
 ```
  $ npm install jest express body-parser nodemon
 ```
@@ -37,7 +35,7 @@ Alteraremos a chave de `scripts` para ficar assim:
 ```
 Lembrando sempre que você pode usar outros nomes e isso não é ruim, mas tome cuidado para não se confundir no restante do curso :)
 
-Agora seu package.json deve estar algo próximo disso:
+Agora seu `package.json` deve estar algo próximo disso:
 
 ```json
 {
@@ -68,7 +66,7 @@ Pode parecer um pouco estranho que o script de desenvolvimento aponte para um ar
 ```
 $ mkdir api && touch api/index.js
 ```
-Estou partindo do pressuposto que estamos dentro do diretório `new_store` e estamos criando diretórios e arquivos dentro dele. Aqui usamos comandos do terminal para criar tudo isso, mas você pode usar seu editor de textos favorito.
+Estou partindo do pressuposto que estamos dentro do diretório `new_store` e estamos criando diretórios e arquivos dentro dele. Aqui usamos comandos do terminal para criar tudo isso, mas você pode usar seu editor de código favorito.
 
 Vamos agora criar novamente o arquivo do docker-compose, aquele que você já está craque, mas agora com uma pequena alteração para que ele possa funcionar melhor. Para entender melhor o que faz o `network`, você pode conferir o livro Docker Para Desenvolvedores, o mesmo que está indicado na primeira parte do tutorial.
 
